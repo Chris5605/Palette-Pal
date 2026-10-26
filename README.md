@@ -15,6 +15,12 @@ Requirements: Node.js 20.6 or later and an Anthropic API key with access to Clau
 
 The API key is only read by the server; do not add it to browser code or commit `.env`. The default model is configured by `ANTHROPIC_MODEL` and can be changed to any Claude model enabled for your Anthropic account. For mobile camera capture, access the app over HTTPS when testing from a phone; browsers generally restrict camera/file capture features on insecure network origins.
 
+## Deploy to Vercel
+
+Connect this repository to a Vercel project and deploy it as a Node.js app. Vercel detects the Express app in `server.js`; static pages and browser assets are in `public/`. The `postinstall` script copies the locally installed Markdown and sanitization browser bundles into `public/vendor/`, which is generated during deployment and is not committed. Configure `ANTHROPIC_API_KEY` as a server-side Vercel environment variable for the deployment environments where matching should be available. Do not prefix it with `VITE_`, `NEXT_PUBLIC_`, or another browser-exposed variable prefix.
+
+The closet continues to use browser `localStorage` on Vercel; no database or account is needed for that. It is stored separately for each site origin and browser profile, so a closet saved on `localhost` will not automatically appear on the Vercel domain. Use the same deployed origin and browser to retain that deployment's closet. Closet export/import between origins is not currently implemented.
+
 ## Photo privacy
 
 Photos stay in the browser until the user submits the form and checks the consent box. Before sending, the browser resizes and converts the selected image to JPEG. The app sends it to the server in memory, and the server forwards it to the Anthropic Claude API for analysis without writing it to disk. Anthropic processes API data under its own policies; review those policies before sharing personal photos. The app does not save photos or retain generated suggestions.

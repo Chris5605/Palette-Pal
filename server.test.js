@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { after, before, test } from "node:test";
 
 process.env.ANTHROPIC_API_KEY = "";
-const { app } = await import("./server.js");
+const { app, default: vercelApp } = await import("./server.js");
 
 let server;
 let baseUrl;
@@ -23,6 +23,7 @@ after(async () => {
 });
 
 test("serves the responsive app", async () => {
+  assert.equal(vercelApp, app);
   const response = await fetch(baseUrl);
   const html = await response.text();
   assert.equal(response.status, 200);

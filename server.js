@@ -47,14 +47,6 @@ const suggestionSchema = {
 
 export const app = express();
 app.use(express.json({ limit: "5mb" }));
-app.use(
-  "/vendor/markdown-it",
-  express.static(path.join(rootDirectory, "node_modules", "markdown-it", "dist", "browser")),
-);
-app.use(
-  "/vendor/dompurify",
-  express.static(path.join(rootDirectory, "node_modules", "dompurify", "dist")),
-);
 app.use(express.static(path.join(rootDirectory, "public")));
 
 app.post("/api/match", async (request, response) => {
@@ -256,3 +248,5 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     console.log(`Palette Pal is running at http://localhost:${port}`);
   });
 }
+
+export default app;

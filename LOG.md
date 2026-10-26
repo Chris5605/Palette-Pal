@@ -20,3 +20,6 @@
 18. What are our deployment options looking like depending on how we implement the save sessions?
 19. If we were to go with the vercel + supabase option, would we need a seperate backend host as well?
 20. I have accounts with both supabase and vercel, so I think I would like to go with that option. What other information do you need to continue?
+21. I have set up projects on both vercel and supabase, what are my next steps?
+22. I think this might be over my head right now. Can we save this for latter, maybe in an AGENTS.md type file?
+23. Awesome. And finally, can we make the current browser-saved closet work with a live deployment on vercel?

@@ -5,6 +5,7 @@
   "description": "A privacy-conscious outfit color matching app for people with color vision deficiency",
   "type": "module",
   "scripts": {
+    "postinstall": "node scripts/prepare-public-assets.js",
     "start": "node --env-file-if-exists=.env server.js",
     "test": "node --test"
   },
