@@ -1,6 +1,6 @@
-# CVD-Assist
+# Palette Pal
 
-Wearwell is a mobile-friendly outfit color matcher for people with color vision deficiency. The first version supports an outfit photo (including mobile camera capture) or a manually selected clothing color, with suggestions tailored to the selected color vision profile. It does not yet include a live camera color identifier.
+Palette Pal is a mobile-friendly outfit color matcher for people with color vision deficiency. The first version supports an outfit photo (including mobile camera capture) or a manually selected clothing color, with suggestions tailored to the selected color vision profile. It does not yet include a live camera color identifier.
 
 ## Run locally
 
@@ -19,6 +19,6 @@ Photos stay in the browser until the user submits the form and checks the consen
 
 ## Test
 
-Claude's Markdown-formatted suggestions are rendered in the browser using locally served Markdown and HTML-sanitization libraries; no third-party CDN is used.
+Claude returns three color suggestions with names, approximate hex codes, and short pairing reasons using Anthropic's structured JSON output. Palette Pal displays them as color swatches alongside Markdown-formatted advice, rendered with locally served Markdown and HTML-sanitization libraries; no third-party CDN is used.
 
 Run `npm test` to exercise the app route, input validation, photo consent requirement, Markdown/sanitizer asset serving, and missing-key behavior. Tests do not call the Anthropic API.

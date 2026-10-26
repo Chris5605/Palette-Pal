@@ -516,6 +516,10 @@ fieldset {
   margin-top: 12px;
 }
 
+.other-garment-field {
+  margin-top: 10px;
+}
+
 .form-field:first-child,
 .field-grid .form-field {
   margin-top: 0;
@@ -724,6 +728,66 @@ fieldset {
 
 .suggestion strong {
   color: #35493e;
+}
+
+.suggestion .palette-heading {
+  margin-bottom: 12px;
+}
+
+.palette-swatches {
+  display: grid;
+  gap: 9px;
+  margin: 0 0 17px;
+  padding: 0;
+  list-style: none;
+}
+
+.palette-swatch {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  padding: 9px;
+  border: 1px solid #e9e9e1;
+  border-radius: 9px;
+  background: #fffefa;
+}
+
+.palette-swatch-sample {
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgb(36 52 45 / 16%);
+  border-radius: 7px;
+}
+
+.palette-swatch-detail {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 2px 8px;
+  min-width: 0;
+}
+
+.palette-swatch-detail strong {
+  overflow-wrap: anywhere;
+}
+
+.palette-swatch-hex {
+  color: #66756d;
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+.palette-swatch-reason {
+  grid-column: 1 / -1;
+  color: #59675f;
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+.palette-advice {
+  padding-top: 12px;
+  border-top: 1px solid #ebebe4;
 }
 
 .result-footer {

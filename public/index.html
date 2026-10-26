@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#f4f1ea">
     <meta name="description" content="Find outfit color combinations with suggestions tailored to your color vision preferences.">
-    <title>Wearwell — Outfit color companion</title>
+    <title>Palette Pal — Your color companion</title>
     <link rel="stylesheet" href="/styles.css">
     <script src="/vendor/markdown-it/markdown-it.umd.min.js" defer></script>
     <script src="/vendor/dompurify/purify.min.js" defer></script>
@@ -14,9 +14,9 @@
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
     <header class="site-header">
-      <a class="brand" href="/" aria-label="Wearwell home">
+      <a class="brand" href="/" aria-label="Palette Pal home">
         <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span>
-        <span>wearwell</span>
+        <span>Palette Pal</span>
       </a>
       <span class="header-note">Your color, your way</span>
     </header>
@@ -89,7 +89,7 @@
               <label class="field-label" for="base-color">Choose the main color in your outfit</label>
               <div class="color-picker-wrap">
                 <input id="base-color" type="color" value="#607b70" aria-label="Choose your outfit's main color">
-                <span id="color-value">#607B70</span>
+                <span id="color-value" aria-live="polite">Approx. muted green · #607B70</span>
               </div>
               <p class="field-hint">Pick the color that best represents the piece you want to match.</p>
             </div>
@@ -102,7 +102,12 @@
                   <option value="bottom">Bottoms</option>
                   <option value="dress">A dress or one-piece</option>
                   <option value="full outfit">A full outfit</option>
+                  <option value="other">Other</option>
                 </select>
+                <div class="form-field other-garment-field" id="other-garment-field" hidden>
+                  <label class="field-label" for="garment-details">What item are you matching?</label>
+                  <input id="garment-details" name="garment-details" type="text" maxlength="60" placeholder="A scarf, shoes, a hat..." disabled>
+                </div>
               </div>
               <div class="form-field">
                 <label class="field-label" for="vision-type">Color vision profile</label>
@@ -159,7 +164,7 @@
     </main>
 
     <footer class="site-footer">
-      <span>Wearwell <span aria-hidden="true">·</span> A more colorful kind of confidence</span>
+      <span>Palette Pal <span aria-hidden="true">·</span> Your friendly guide to color confidence</span>
       <span>Designed to be seen in more ways</span>
     </footer>
   </body>

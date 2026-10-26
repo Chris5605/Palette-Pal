@@ -24,8 +24,10 @@ after(async () => {
 
 test("serves the responsive app", async () => {
   const response = await fetch(baseUrl);
+  const html = await response.text();
   assert.equal(response.status, 200);
-  assert.match(await response.text(), /Getting dressed/);
+  assert.match(html, /Getting dressed/);
+  assert.match(html, /<title>Palette Pal/);
 });
 
 test("serves local Markdown and sanitization libraries", async () => {
@@ -53,6 +55,23 @@ test("rejects unknown color vision profiles", async () => {
 
   assert.equal(response.status, 400);
   assert.match((await response.json()).error, /color vision profile/i);
+});
+
+test("requires a description when matching another garment type", async () => {
+  const response = await fetch(`${baseUrl}/api/match`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      visionType: "protanopia",
+      garment: "other",
+      occasion: "",
+      notes: "",
+      color: "#607b70",
+    }),
+  });
+
+  assert.equal(response.status, 400);
+  assert.match((await response.json()).error, /describe the item/i);
 });
 
 test("requires consent before accepting a photo for analysis", async () => {
@@ -103,7 +122,17 @@ test("returns a suggestion from the configured Claude service", async () => {
     assert.equal(options.headers["anthropic-version"], "2023-06-01");
     forwardedRequest = JSON.parse(options.body);
     return new Response(JSON.stringify({
-      content: [{ type: "text", text: "Outfit colors\nTry sage with navy." }],
+      content: [{
+        type: "text",
+        text: JSON.stringify({
+          colors: [
+            { name: "Sage", hex: "#9CAF88", reason: "A soft, earthy contrast." },
+            { name: "Navy", hex: "#303D63", reason: "Adds depth and clear contrast." },
+            { name: "Cream", hex: "#F2E6C9", reason: "A warm, lighter neutral." },
+          ],
+          advice: "## Why these may work\nThey balance softness and contrast.",
+        }),
+      }],
     }), { status: 200, headers: { "Content-Type": "application/json" } });
   };
 
@@ -113,7 +142,8 @@ test("returns a suggestion from the configured Claude service", async () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         visionType: "protanopia",
-        garment: "top",
+        garment: "other",
+        garmentDetails: "A scarf",
         occasion: "",
         notes: "",
         color: "#607b70",
@@ -121,9 +151,15 @@ test("returns a suggestion from the configured Claude service", async () => {
     });
 
     assert.equal(response.status, 200);
-    assert.equal((await response.json()).suggestion, "Outfit colors\nTry sage with navy.");
+    const result = await response.json();
+    assert.equal(result.colors.length, 3);
+    assert.equal(result.colors[0].hex, "#9CAF88");
+    assert.match(result.advice, /Why these may work/);
     assert.equal(forwardedRequest.model, "test-claude-model");
     assert.equal(forwardedRequest.max_tokens, 600);
+    assert.equal(forwardedRequest.output_config.format.type, "json_schema");
+    assert.deepEqual(forwardedRequest.output_config.format.schema.required, ["colors", "advice"]);
+    assert.match(forwardedRequest.messages[0].content[0].text, /Garment: A scarf\./);
   } finally {
     globalThis.fetch = originalFetch;
     if (originalApiKey === undefined) {
