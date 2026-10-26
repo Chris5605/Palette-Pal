@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="/styles.css">
     <script src="/vendor/markdown-it/markdown-it.umd.min.js" defer></script>
     <script src="/vendor/dompurify/purify.min.js" defer></script>
+    <script src="/closet-store.js" defer></script>
+    <script src="/color-utils.js" defer></script>
     <script src="/app.js" defer></script>
   </head>
   <body>
@@ -18,7 +20,10 @@
         <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span>
         <span>Palette Pal</span>
       </a>
-      <span class="header-note">Your color, your way</span>
+      <nav class="site-nav" aria-label="Main navigation">
+        <a class="nav-link" href="/closet.html">My Closet</a>
+        <a class="nav-link is-current" href="/" aria-current="page">Outfit matcher</a>
+      </nav>
     </header>
 
     <main id="main">
@@ -56,13 +61,16 @@
 
           <form id="match-form">
             <fieldset class="mode-fieldset">
-              <legend>How would you like to start?</legend>
-              <div class="mode-switch" role="group" aria-label="Starting method">
+              <legend>Choose how to build your match</legend>
+              <div class="mode-switch" role="group" aria-label="Match input">
                 <button type="button" class="mode-button is-active" id="photo-mode-button" aria-pressed="true">
                   <span aria-hidden="true">▧</span> Use a photo
                 </button>
                 <button type="button" class="mode-button" id="manual-mode-button" aria-pressed="false">
                   <span aria-hidden="true">◉</span> Pick a color
+                </button>
+                <button type="button" class="mode-button" id="closet-mode-button" aria-pressed="false">
+                  <span aria-hidden="true">▤</span> From my closet
                 </button>
               </div>
             </fieldset>
@@ -92,6 +100,14 @@
                 <span id="color-value" aria-live="polite">Approx. muted green · #607B70</span>
               </div>
               <p class="field-hint">Pick the color that best represents the piece you want to match.</p>
+            </div>
+
+            <div class="closet-match-panel" id="closet-match-panel" hidden>
+              <p class="field-label">Choose pieces for your outfit ideas</p>
+              <p class="field-hint">Select up to eight pieces. Only selected item details are sent to Anthropic with your request.</p>
+              <ul class="closet-match-list" id="closet-match-list" aria-label="Closet pieces to use in matching"></ul>
+              <p class="closet-match-empty" id="closet-match-empty" hidden>Your closet is empty. <a href="/closet.html">Add pieces to My Closet</a> first.</p>
+              <p class="closet-match-error" id="closet-match-error" role="alert" hidden></p>
             </div>
 
             <div class="field-grid">
@@ -134,7 +150,7 @@
             <button class="submit-button" id="submit-button" type="submit">
               Find my color match <span aria-hidden="true">→</span>
             </button>
-            <p class="form-footnote">Your preferences help shape a suggestion. You decide what feels right.</p>
+            <p class="form-footnote">Your preferences help shape a suggestion. Selected closet details are included only when you choose closet pieces.</p>
           </form>
         </div>
 

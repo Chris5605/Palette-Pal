@@ -1,8 +1,13 @@
 const form = document.querySelector("#match-form");
 const photoModeButton = document.querySelector("#photo-mode-button");
 const manualModeButton = document.querySelector("#manual-mode-button");
+const closetModeButton = document.querySelector("#closet-mode-button");
 const photoPanel = document.querySelector("#photo-panel");
 const manualPanel = document.querySelector("#manual-panel");
+const closetMatchPanel = document.querySelector("#closet-match-panel");
+const closetMatchList = document.querySelector("#closet-match-list");
+const closetMatchEmpty = document.querySelector("#closet-match-empty");
+const closetMatchError = document.querySelector("#closet-match-error");
 const photoInput = document.querySelector("#outfit-photo");
 const photoPreview = document.querySelector("#photo-preview");
 const previewWrap = document.querySelector("#preview-wrap");
@@ -25,84 +30,102 @@ const markdown = window.markdownit({
   linkify: false,
   breaks: true,
 });
+const closetStore = window.PalettePalCloset;
+const { getApproximateColorName } = window.PalettePalColors;
+const maximumSelectedClosetItems = 8;
 
 let selectedPhoto;
 let currentMode = "photo";
-
-const namedColors = [
-  ["Black", "#202020"],
-  ["Charcoal", "#4a4a4a"],
-  ["Gray", "#888888"],
-  ["Silver", "#c0c0c0"],
-  ["White", "#f5f5f5"],
-  ["Cream", "#f2e6c9"],
-  ["Taupe", "#9b8877"],
-  ["Brown", "#805333"],
-  ["Rust", "#ad4f32"],
-  ["Red", "#c63d3d"],
-  ["Coral", "#e88070"],
-  ["Orange", "#df7628"],
-  ["Mustard yellow", "#c4a02d"],
-  ["Yellow", "#e5d34f"],
-  ["Olive", "#77783c"],
-  ["Muted green", "#6e806a"],
-  ["Sage green", "#9caf88"],
-  ["Forest green", "#315b43"],
-  ["Teal", "#398c88"],
-  ["Mint", "#9ed5bd"],
-  ["Sky blue", "#79b5d1"],
-  ["Blue", "#4169a1"],
-  ["Navy", "#303d63"],
-  ["Lavender", "#aa98ca"],
-  ["Purple", "#79539b"],
-  ["Plum", "#74435f"],
-  ["Pink", "#d887a1"],
-];
-
-function getApproximateColorName(hex) {
-  const red = Number.parseInt(hex.slice(1, 3), 16);
-  const green = Number.parseInt(hex.slice(3, 5), 16);
-  const blue = Number.parseInt(hex.slice(5, 7), 16);
-  let nearestName = "color";
-  let minimumDistance = Number.POSITIVE_INFINITY;
-
-  for (const [name, sampleHex] of namedColors) {
-    const sampleRed = Number.parseInt(sampleHex.slice(1, 3), 16);
-    const sampleGreen = Number.parseInt(sampleHex.slice(3, 5), 16);
-    const sampleBlue = Number.parseInt(sampleHex.slice(5, 7), 16);
-    const redMean = (red + sampleRed) / 2;
-    const redDifference = red - sampleRed;
-    const greenDifference = green - sampleGreen;
-    const blueDifference = blue - sampleBlue;
-    const distance =
-      (2 + redMean / 256) * redDifference ** 2 +
-      4 * greenDifference ** 2 +
-      (2 + (255 - redMean) / 256) * blueDifference ** 2;
-
-    if (distance < minimumDistance) {
-      minimumDistance = distance;
-      nearestName = name;
-    }
-  }
-
-  return nearestName;
-}
-
-function setMode(mode) {
-  currentMode = mode;
-  const photoSelected = mode === "photo";
-  photoPanel.hidden = !photoSelected;
-  manualPanel.hidden = photoSelected;
-  photoModeButton.classList.toggle("is-active", photoSelected);
-  manualModeButton.classList.toggle("is-active", !photoSelected);
-  photoModeButton.setAttribute("aria-pressed", String(photoSelected));
-  manualModeButton.setAttribute("aria-pressed", String(!photoSelected));
-  clearError();
-}
+let closetItems = [];
+let selectedClosetIds = new Set();
+let closetStorageAvailable = true;
 
 function clearError() {
   resultError.hidden = true;
   resultError.textContent = "";
+  closetMatchError.hidden = true;
+  closetMatchError.textContent = "";
+}
+
+function setMode(mode) {
+  currentMode = mode;
+  const buttons = [
+    [photoModeButton, "photo"],
+    [manualModeButton, "manual"],
+    [closetModeButton, "closet"],
+  ];
+  for (const [button, buttonMode] of buttons) {
+    const selected = mode === buttonMode;
+    button.classList.toggle("is-active", selected);
+    button.setAttribute("aria-pressed", String(selected));
+  }
+  photoPanel.hidden = mode !== "photo";
+  manualPanel.hidden = mode !== "manual";
+  closetMatchPanel.hidden = mode !== "closet";
+  clearError();
+}
+
+function showClosetError(message) {
+  closetMatchError.textContent = message;
+  closetMatchError.hidden = false;
+}
+
+function renderClosetChoices() {
+  closetMatchList.replaceChildren();
+  closetMatchEmpty.hidden = closetItems.length > 0 || !closetStorageAvailable;
+
+  for (const closetItem of closetItems) {
+    const item = document.createElement("li");
+    item.className = "closet-item";
+    const label = document.createElement("label");
+    label.className = "closet-item-select";
+
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.className = "closet-item-checkbox";
+    checkbox.value = closetItem.id;
+    checkbox.checked = selectedClosetIds.has(closetItem.id);
+    checkbox.setAttribute("aria-label", `Include ${closetItem.name} in outfit suggestions`);
+
+    const swatch = document.createElement("span");
+    swatch.className = "closet-item-swatch";
+    swatch.style.backgroundColor = closetItem.color;
+    swatch.setAttribute("aria-hidden", "true");
+
+    const details = document.createElement("span");
+    details.className = "closet-item-details";
+    const name = document.createElement("strong");
+    name.textContent = closetItem.name;
+    const category = document.createElement("span");
+    category.textContent =
+      `${closetStore.categories.get(closetItem.category)} · Approx. ${getApproximateColorName(closetItem.color).toLowerCase()} · ${closetItem.color.toUpperCase()}`;
+    details.append(name, category);
+    if (closetItem.notes) {
+      const notes = document.createElement("span");
+      notes.textContent = closetItem.notes;
+      details.append(notes);
+    }
+    label.append(checkbox, swatch, details);
+    item.append(label);
+    closetMatchList.append(item);
+  }
+}
+
+function loadCloset() {
+  try {
+    closetItems = closetStore.load();
+    const availableIds = new Set(closetItems.map(({ id }) => id));
+    selectedClosetIds = new Set([...selectedClosetIds].filter((id) => availableIds.has(id)));
+    closetStorageAvailable = true;
+    closetMatchEmpty.hidden = closetItems.length > 0;
+  } catch (error) {
+    console.error("Could not load the local closet:", error);
+    closetItems = [];
+    selectedClosetIds.clear();
+    closetStorageAvailable = false;
+    showClosetError("Saved closet data could not be read. Changes are disabled to protect your closet.");
+  }
+  renderClosetChoices();
 }
 
 function setPhoto(file) {
@@ -149,43 +172,7 @@ function readAsJpeg(file) {
   });
 }
 
-photoModeButton.addEventListener("click", () => setMode("photo"));
-manualModeButton.addEventListener("click", () => setMode("manual"));
-
-photoInput.addEventListener("change", () => {
-  const file = photoInput.files?.[0];
-  if (!file) return;
-  if (!file.type.startsWith("image/")) {
-    setPhoto(undefined);
-    resultError.textContent = "Choose an image file to continue.";
-    resultError.hidden = false;
-    return;
-  }
-  if (file.size > 15 * 1024 * 1024) {
-    setPhoto(undefined);
-    resultError.textContent = "That photo is larger than 15 MB. Choose a smaller image.";
-    resultError.hidden = false;
-    return;
-  }
-  setPhoto(file);
-});
-
-removePhotoButton.addEventListener("click", () => setPhoto(undefined));
-
-baseColor.addEventListener("input", () => {
-  colorValue.textContent =
-    `Approx. ${getApproximateColorName(baseColor.value).toLowerCase()} · ${baseColor.value.toUpperCase()}`;
-});
-
-garmentSelect.addEventListener("change", () => {
-  const isOther = garmentSelect.value === "other";
-  otherGarmentField.hidden = !isOther;
-  garmentDetails.disabled = !isOther;
-  garmentDetails.required = isOther;
-  if (!isOther) garmentDetails.value = "";
-});
-
-form.addEventListener("submit", async (event) => {
+async function requestMatch(event) {
   event.preventDefault();
   clearError();
   if (currentMode === "photo" && !selectedPhoto) {
@@ -199,15 +186,31 @@ form.addEventListener("submit", async (event) => {
     photoConsent.focus();
     return;
   }
+  if (currentMode === "closet") {
+    if (!closetStorageAvailable) {
+      showClosetError("Your saved closet could not be read, so it cannot be used for matching.");
+      return;
+    }
+    if (selectedClosetIds.size === 0) {
+      showClosetError("Choose at least one closet piece, or add pieces on the My Closet page.");
+      return;
+    }
+  }
 
   submitButton.disabled = true;
   emptyState.hidden = true;
   resultLoading.hidden = false;
-  const suggestion = resultBody.querySelector(".suggestion");
-  suggestion?.remove();
+  resultError.hidden = true;
+  resultBody.querySelector(".suggestion")?.remove();
 
   try {
     const image = currentMode === "photo" ? await readAsJpeg(selectedPhoto) : undefined;
+    const selectedItems = currentMode === "closet"
+      ? [...selectedClosetIds]
+        .map((id) => closetItems.find((item) => item.id === id))
+        .filter(Boolean)
+        .map(({ name, category, color, notes }) => ({ name, category, color, notes }))
+      : [];
     const response = await fetch("/api/match", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -220,6 +223,7 @@ form.addEventListener("submit", async (event) => {
         color: currentMode === "manual" ? baseColor.value : undefined,
         image,
         photoConsent: currentMode === "photo" && photoConsent.checked,
+        closetItems: selectedItems,
       }),
     });
     const result = await response.json();
@@ -292,4 +296,56 @@ form.addEventListener("submit", async (event) => {
     resultLoading.hidden = true;
     submitButton.disabled = false;
   }
+}
+
+photoModeButton.addEventListener("click", () => setMode("photo"));
+manualModeButton.addEventListener("click", () => setMode("manual"));
+closetModeButton.addEventListener("click", () => setMode("closet"));
+photoInput.addEventListener("change", () => {
+  const file = photoInput.files?.[0];
+  if (!file) return;
+  if (!file.type.startsWith("image/")) {
+    setPhoto(undefined);
+    resultError.textContent = "Choose an image file to continue.";
+    resultError.hidden = false;
+    return;
+  }
+  if (file.size > 15 * 1024 * 1024) {
+    setPhoto(undefined);
+    resultError.textContent = "That photo is larger than 15 MB. Choose a smaller image.";
+    resultError.hidden = false;
+    return;
+  }
+  setPhoto(file);
 });
+removePhotoButton.addEventListener("click", () => setPhoto(undefined));
+baseColor.addEventListener("input", () => {
+  colorValue.textContent =
+    `Approx. ${getApproximateColorName(baseColor.value).toLowerCase()} · ${baseColor.value.toUpperCase()}`;
+});
+closetMatchList.addEventListener("change", (event) => {
+  const checkbox = event.target.closest(".closet-item-checkbox");
+  if (!checkbox) return;
+  if (checkbox.checked && selectedClosetIds.size >= maximumSelectedClosetItems) {
+    checkbox.checked = false;
+    showClosetError(`Select up to ${maximumSelectedClosetItems} closet items for one suggestion.`);
+    return;
+  }
+  if (checkbox.checked) selectedClosetIds.add(checkbox.value);
+  else selectedClosetIds.delete(checkbox.value);
+  closetMatchError.hidden = true;
+});
+window.addEventListener("storage", (event) => {
+  if (event.key !== "palette-pal-closet-v1") return;
+  loadCloset();
+});
+garmentSelect.addEventListener("change", () => {
+  const isOther = garmentSelect.value === "other";
+  otherGarmentField.hidden = !isOther;
+  garmentDetails.disabled = !isOther;
+  garmentDetails.required = isOther;
+  if (!isOther) garmentDetails.value = "";
+});
+form.addEventListener("submit", requestMatch);
+
+loadCloset();

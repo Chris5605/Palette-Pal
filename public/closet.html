@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f4f1ea">
+    <meta name="description" content="Keep a private, on-device catalog of clothing colors with Palette Pal.">
+    <title>My Closet — Palette Pal</title>
+    <link rel="stylesheet" href="/styles.css">
+    <script src="/closet-store.js" defer></script>
+    <script src="/color-utils.js" defer></script>
+    <script src="/closet.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <a class="brand" href="/" aria-label="Palette Pal home">
+        <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span>
+        <span>Palette Pal</span>
+      </a>
+      <nav class="site-nav" aria-label="Main navigation">
+        <a class="nav-link is-current" href="/closet.html" aria-current="page">My Closet</a>
+        <a class="nav-link" href="/">Outfit matcher</a>
+      </nav>
+    </header>
+
+    <main id="main">
+      <section class="closet-section closet-page" aria-labelledby="closet-title">
+        <div class="closet-heading">
+          <div>
+            <p class="eyebrow">YOUR PERSONAL CATALOG</p>
+            <h1 id="closet-title">My Closet</h1>
+            <p class="closet-intro">Keep track of pieces you own and choose them when you want outfit color ideas.</p>
+          </div>
+          <span class="local-badge">Saved on this device</span>
+        </div>
+        <p class="closet-privacy">Your closet stays in this browser and is lost if this site’s data is cleared. It does not sync between devices. Only items you select are sent to Anthropic with a match request. Color-sampling photos are processed here and immediately discarded.</p>
+
+        <form id="closet-form" class="closet-form">
+          <div class="closet-fields">
+            <div class="form-field">
+              <label class="field-label" for="closet-name">Item name</label>
+              <input id="closet-name" name="name" type="text" maxlength="80" placeholder="Olive rain jacket" required>
+            </div>
+            <div class="form-field">
+              <label class="field-label" for="closet-category">Category</label>
+              <select id="closet-category" name="category">
+                <option value="tops">Tops</option>
+                <option value="bottoms">Bottoms</option>
+                <option value="one-piece">Dresses & one-pieces</option>
+                <option value="outerwear">Outerwear</option>
+                <option value="shoes">Shoes</option>
+                <option value="accessories">Accessories</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div class="form-field closet-color-field">
+              <label class="field-label" for="closet-color">Main color</label>
+              <div class="closet-color-controls">
+                <input id="closet-color" type="color" value="#607b70" aria-label="Choose the item's main color">
+                <span id="closet-color-value" aria-live="polite">Approx. muted green · #607B70</span>
+              </div>
+              <label class="sample-color-button" for="closet-color-photo">Sample from a photo (processed here, not saved)</label>
+              <span class="closet-color-hint">Estimated from the image center; lighting may affect the result.</span>
+              <input class="visually-hidden" id="closet-color-photo" type="file" accept="image/*" capture="environment">
+            </div>
+            <div class="form-field">
+              <label class="field-label" for="closet-notes">Notes <span class="optional">(optional)</span></label>
+              <input id="closet-notes" name="notes" type="text" maxlength="160" placeholder="Lightweight, textured, for rainy days">
+            </div>
+          </div>
+          <button class="closet-add-button" type="submit">Add to my closet <span aria-hidden="true">+</span></button>
+        </form>
+
+        <p class="closet-message" id="closet-message" role="status" aria-live="polite"></p>
+        <p class="closet-message closet-message-error" id="closet-error" role="alert" hidden></p>
+        <div class="closet-list-header">
+          <h2>Your pieces</h2>
+          <span id="closet-count">0 items</span>
+        </div>
+        <ul class="closet-list" id="closet-list" aria-label="Saved closet items"></ul>
+        <p class="closet-empty" id="closet-empty">Your closet is empty for now. Add a piece above to get started.</p>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>Palette Pal <span aria-hidden="true">·</span> Your friendly guide to color confidence</span>
+      <span>Designed to be seen in more ways</span>
+    </footer>
+  </body>
+</html>

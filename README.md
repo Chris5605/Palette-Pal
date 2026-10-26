@@ -2,6 +2,8 @@
 
 Palette Pal is a mobile-friendly outfit color matcher for people with color vision deficiency. The first version supports an outfit photo (including mobile camera capture) or a manually selected clothing color, with suggestions tailored to the selected color vision profile. It does not yet include a live camera color identifier.
 
+The local-first closet is managed on its own **My Closet** page and lets users save item names, categories, approximate colors, and notes in the current browser. The matcher has three modes: use an outfit photo, pick a color, or choose up to eight closet pieces. Closet-only matching does not require a separate base color. Selected item details are sent to Anthropic only with the match request; closet entries are not uploaded or synced. Optional photo color sampling estimates the color at the center of an image in the browser, then discards the source photo without saving or uploading it. Clearing this origin's browser site data removes the closet; accounts and data export are not included yet.
+
 ## Run locally
 
 Requirements: Node.js 20.6 or later and an Anthropic API key with access to Claude.

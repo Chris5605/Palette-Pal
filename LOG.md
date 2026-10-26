@@ -13,3 +13,10 @@
 11. When I select other it asks for me to choose a valid garment type
 12. Next, can we somehow retrieve the color suggestions in the response, perhaps asking for a hex code, and display example colors to the user?
 13. It is now returning "The outfit suggestion service returned incomplete color suggestions. Please try again.", any ideas?
+14. Alright, lets expand functionality. I would like for there to be a way that users can save a catalog, or closet, containing roughly the clothes they have. This would likely require some form of account sign up to save data. What do you think?
+15. Awesome. Can we add the closet piece selector to a third tab in the lets find your match section and then move the closet itself into a seperate page?
+16. Awesome! Can we update the header on the outfit matcher screen so that it is consitent with the My Closet screen?
+17. Awesome, now lets take a look at allowing users to create an account to save sessions or transfer closet data across devices. How much work would that take to implement?
+18. What are our deployment options looking like depending on how we implement the save sessions?
+19. If we were to go with the vercel + supabase option, would we need a seperate backend host as well?
+20. I have accounts with both supabase and vercel, so I think I would like to go with that option. What other information do you need to continue?
