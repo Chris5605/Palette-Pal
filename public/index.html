@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f4f1ea">
+    <meta name="description" content="Find outfit color combinations with suggestions tailored to your color vision preferences.">
+    <title>Wearwell — Outfit color companion</title>
+    <link rel="stylesheet" href="/styles.css">
+    <script src="/vendor/markdown-it/markdown-it.umd.min.js" defer></script>
+    <script src="/vendor/dompurify/purify.min.js" defer></script>
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <a class="brand" href="/" aria-label="Wearwell home">
+        <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span>
+        <span>wearwell</span>
+      </a>
+      <span class="header-note">Your color, your way</span>
+    </header>
+
+    <main id="main">
+      <section class="hero" aria-labelledby="page-title">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="eyebrow-dot"></span> YOUR PERSONAL COLOR COMPANION</p>
+          <h1 id="page-title">Getting dressed,<br><span>made easier.</span></h1>
+          <p class="hero-description">Explore outfit colors with suggestions made around how you see color. No rules, just ideas that feel like you.</p>
+          <div class="hero-points" aria-label="App features">
+            <span><span class="check-icon" aria-hidden="true">✓</span> Made for your color vision</span>
+            <span><span class="check-icon" aria-hidden="true">✓</span> Photo sharing is your choice</span>
+          </div>
+        </div>
+        <div class="hero-art" aria-hidden="true">
+          <div class="orbit orbit-one"></div>
+          <div class="orbit orbit-two"></div>
+          <div class="art-sun"></div>
+          <div class="art-swatch swatch-one"></div>
+          <div class="art-swatch swatch-two"></div>
+          <div class="art-swatch swatch-three"></div>
+          <div class="art-swatch swatch-four"></div>
+          <div class="art-note"><span>✳</span> Find your<br>feel-good palette</div>
+        </div>
+      </section>
+
+      <section class="matcher-layout" aria-label="Outfit color matcher">
+        <div class="form-card">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">LET'S FIND YOUR MATCH</p>
+              <h2>Start with what you have</h2>
+            </div>
+            <span class="step-badge">01 <span>/ 02</span></span>
+          </div>
+
+          <form id="match-form">
+            <fieldset class="mode-fieldset">
+              <legend>How would you like to start?</legend>
+              <div class="mode-switch" role="group" aria-label="Starting method">
+                <button type="button" class="mode-button is-active" id="photo-mode-button" aria-pressed="true">
+                  <span aria-hidden="true">▧</span> Use a photo
+                </button>
+                <button type="button" class="mode-button" id="manual-mode-button" aria-pressed="false">
+                  <span aria-hidden="true">◉</span> Pick a color
+                </button>
+              </div>
+            </fieldset>
+
+            <div class="photo-panel" id="photo-panel">
+              <label class="upload-area" for="outfit-photo" id="upload-area">
+                <span class="upload-icon" aria-hidden="true">↑</span>
+                <span class="upload-title">Take a photo or choose one</span>
+                <span class="upload-hint">JPG, PNG, or WebP · your photo is not saved by this app</span>
+                <input id="outfit-photo" name="photo" type="file" accept="image/*" capture="environment">
+              </label>
+              <div class="preview-wrap" id="preview-wrap" hidden>
+                <img id="photo-preview" alt="Preview of the selected outfit">
+                <button type="button" class="remove-photo" id="remove-photo" aria-label="Remove selected photo">×</button>
+              </div>
+              <p class="privacy-note"><strong>Photo privacy:</strong> Your photo is only sent for analysis if you submit with consent. It is sent to Anthropic's Claude API for processing and is not saved by this app. Review Anthropic's data policies before sharing personal photos.</p>
+              <label class="consent-row" id="consent-row" hidden>
+                <input id="photo-consent" type="checkbox">
+                <span>I agree to send this photo to Anthropic's Claude API for outfit analysis.</span>
+              </label>
+            </div>
+
+            <div class="manual-panel" id="manual-panel" hidden>
+              <label class="field-label" for="base-color">Choose the main color in your outfit</label>
+              <div class="color-picker-wrap">
+                <input id="base-color" type="color" value="#607b70" aria-label="Choose your outfit's main color">
+                <span id="color-value">#607B70</span>
+              </div>
+              <p class="field-hint">Pick the color that best represents the piece you want to match.</p>
+            </div>
+
+            <div class="field-grid">
+              <div class="form-field">
+                <label class="field-label" for="garment">What are we matching?</label>
+                <select id="garment" name="garment">
+                  <option value="top">A top</option>
+                  <option value="bottom">Bottoms</option>
+                  <option value="dress">A dress or one-piece</option>
+                  <option value="full outfit">A full outfit</option>
+                </select>
+              </div>
+              <div class="form-field">
+                <label class="field-label" for="vision-type">Color vision profile</label>
+                <select id="vision-type" name="vision-type">
+                  <option value="protanopia" selected>Protanopia</option>
+                  <option value="deuteranopia">Deuteranopia</option>
+                  <option value="tritanopia">Tritanopia</option>
+                  <option value="monochromacy">Monochromacy</option>
+                  <option value="unsure">I'm not sure</option>
+                </select>
+                <span class="field-hint">Suggestions are ideas, not medical advice.</span>
+              </div>
+            </div>
+
+            <div class="form-field">
+              <label class="field-label" for="occasion">Where are you headed? <span class="optional">(optional)</span></label>
+              <input id="occasion" name="occasion" type="text" maxlength="80" placeholder="A casual day out, an interview...">
+            </div>
+            <div class="form-field">
+              <label class="field-label" for="notes">Anything else to keep in mind? <span class="optional">(optional)</span></label>
+              <input id="notes" name="notes" type="text" maxlength="300" placeholder="Favorite colors, comfort, a mood...">
+            </div>
+
+            <button class="submit-button" id="submit-button" type="submit">
+              Find my color match <span aria-hidden="true">→</span>
+            </button>
+            <p class="form-footnote">Your preferences help shape a suggestion. You decide what feels right.</p>
+          </form>
+        </div>
+
+        <aside class="result-card" aria-labelledby="result-title">
+          <div class="result-header">
+            <div class="result-icon" aria-hidden="true">✳</div>
+            <div>
+              <p class="eyebrow">YOUR COLOR NOTES</p>
+              <h2 id="result-title">A little inspiration</h2>
+            </div>
+          </div>
+          <div class="result-body" id="result-body" aria-live="polite" aria-atomic="true">
+            <div class="empty-state" id="empty-state">
+              <div class="mini-swatches" aria-hidden="true"><span></span><span></span><span></span></div>
+              <p>Your outfit ideas will show up here.</p>
+              <span>Start with a photo or choose a color to get a personalized suggestion.</span>
+            </div>
+          </div>
+          <div class="result-loading" id="result-loading" hidden>
+            <span class="loading-spinner" aria-hidden="true"></span>
+            <span>Finding some color inspiration...</span>
+          </div>
+          <div class="result-error" id="result-error" role="alert" hidden></div>
+          <div class="result-footer"><span class="footer-sparkle" aria-hidden="true">✳</span> Style is personal. These are just ideas.</div>
+        </aside>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>Wearwell <span aria-hidden="true">·</span> A more colorful kind of confidence</span>
+      <span>Designed to be seen in more ways</span>
+    </footer>
+  </body>
+</html>

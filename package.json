@@ -1,0 +1,19 @@
+{
+  "name": "cvd-assist",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A privacy-conscious outfit color matching app for people with color vision deficiency",
+  "type": "module",
+  "scripts": {
+    "start": "node --env-file-if-exists=.env server.js",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "dompurify": "^3.4.17",
+    "express": "^5.1.0",
+    "markdown-it": "^15.0.3"
+  }
+}
